@@ -63,7 +63,7 @@ def plot_results(filetype='pdf'):
     df1 = pd.read_csv(f'{name1}.csv')
     label1, label2 = ('$x$', '$y$')
     equilibrium1 = [(0.39680, '$x^\\ast$'), (0.62996, '$y^\\ast$')]
-    min_x, max_x = (0, 1000)
+    min_x, max_x = (0, df1['iteration'].max())
     min_y, max_y = (-1, 1)
     plot_points(filetype, name1, df1, equilibrium=equilibrium1, min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y,
                 label1=label1, label2=label2, y_label=y_label1)
@@ -73,7 +73,7 @@ def plot_results(filetype='pdf'):
     df2 = pd.read_csv(f'{name2}.csv')
     label1, label2 = ('$p_x$', '$p_y$')
     equilibrium2 = [(22.987, '$p^\\ast_x$ and $p^\\ast_y$')]
-    min_x, max_x = (0, 10)
+    min_x, max_x = (0, df2['iteration'].max())
     min_y, max_y = (10, 25)
     plot_points(filetype, name2, df2, equilibrium=equilibrium2, min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y,
                 label1=label1, label2=label2, y_label=y_label2)
