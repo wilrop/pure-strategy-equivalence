@@ -35,18 +35,60 @@ def continuous_br(monfg, u_tpl, player, opp_x, min_x, max_x):
 
 
 def run_polynomial_game(min_x=-1, max_x=1, max_iter=1000):
+    """Run a polynomial game experiment.
+
+    Args:
+        min_x (float, optional): The minimum value in the strategy interval. (Default value = -1)
+        max_x (float, optional): The maximum value in the strategy interval. (Default value = 1)
+        max_iter (int, optional): The maximum number of iterations to run the algorithm for. (Default value = 1000)
+
+    Returns:
+        bool, List[ndarray], List[ndarray]: Whether the final strategy is a Nash equilibrium, the last joint strategy
+            and the full log of joint strategies.
+    """
     monfg, u_tpl = setup_polynomial_game(min_x, max_x)
     ne, joint_strat, log = run_experiment(monfg, u_tpl, max_iter=max_iter)
     return ne, joint_strat, log
 
 
 def run_bertrand_pricing_game(min_price=1, max_price=100, sigma=3, gamma=2, n=2700, m=1, a=50, max_iter=100):
+    """Run a polynomial game experiment.
+
+    Args:
+        min_price (float, optional): The minimum value in the strategy interval. (Default value = -1)
+        max_price (float, optional): The maximum value in the strategy interval. (Default value = 1)
+        sigma (float, optional): The elasticity of substitution between x and y. (Default value = 3)
+        gamma (float, optional): The elasticity of demand for the composite good. (Default value = 2)
+        n (int, optional): The number of type two customers. (Default value = 2700)
+        m (float, optional): The unit cost of production for each firm. (Default value = 1)
+        a (float, optional): All factors affecting price other than demand. (Default value = 50)
+        max_iter (int, optional): The maximum number of iterations to run the algorithm for. (Default value = 100)
+
+    Returns:
+        bool, List[ndarray], List[ndarray]: Whether the final strategy is a Nash equilibrium, the last joint strategy
+            and the full log of joint strategies.
+    """
     monfg, u_tpl = setup_bertrand_pricing_game(min_price, max_price, sigma, gamma, n, m, a)
     ne, joint_strat, log = run_experiment(monfg, u_tpl, max_iter=max_iter)
     return ne, joint_strat, log
 
 
 def run_experiment(monfg, u_tpl, algorithm='FP', max_iter=1000, variant='alternating', global_opt=True):
+    """Run an experiment.
+
+    Args:
+        monfg (List[ndarray]): A list of payoff matrices.
+        u_tpl (Tuple[callable]): A tuple of utility functions.
+        algorithm (str, optional): The requested algorithm. (Default value = 'FP')
+        max_iter (int, optional): The maximum amount of iterations to run IBR for. (Default value = 1000)
+        variant (str, optional): The variant to use, which is either simultaneous or alternating.
+            (Default value = 'alternating')
+        global_opt (bool, optional): Whether to use a global optimiser or a local one. (Default value = False)
+
+    Returns:
+        bool, List[ndarray], List[ndarray]: Whether the final strategy is a Nash equilibrium, the last joint strategy
+            and the full log of joint strategies.
+    """
     if algorithm == 'FP':
         return fictitious_play(monfg, u_tpl, max_iter=max_iter, variant=variant, global_opt=global_opt)
     elif algorithm == 'IBR':
@@ -56,6 +98,17 @@ def run_experiment(monfg, u_tpl, algorithm='FP', max_iter=1000, variant='alterna
 
 
 def transform_log(run, log, min_x, max_x):
+    """Transform the strategy log of a run to continuous strategies.
+
+    Args:
+        run (int): The current run.
+        log (List[ndarray]): A log of strategies in the multi-objective game.
+        min_x (float): The minimum of the strategy interval.
+        max_x (float): The maximum of the strategy interval.
+
+    Returns:
+        List[float]: A log of strategies in the continuous game.
+    """
     transformed_log = []
     for record in log:
         i = record[0]
@@ -69,6 +122,15 @@ def transform_log(run, log, min_x, max_x):
 
 
 def save_logs(logs, name):
+    """Save the logs to a CSV file.
+
+    Args:
+        logs (List[float]): A log of strategies in the continuous game.
+        name (str): The name of the experiment.
+
+    Returns:
+
+    """
     columns = ['run', 'iteration', 'player1', 'player2']
     filename = f'{name}.csv'
     df = pd.DataFrame(logs, columns=columns)
@@ -76,6 +138,14 @@ def save_logs(logs, name):
 
 
 def run_experiments(runs=100):
+    """Run all experiments for a number of trials.
+
+    Args:
+        runs (int, optional): The number of times to repeat the experiments. (Default value = 100)
+
+    Returns:
+
+    """
     poly_min_x = -1
     poly_max_x = 1
     poly_iters = 1000
