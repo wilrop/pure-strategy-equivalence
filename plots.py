@@ -35,7 +35,26 @@ def save_plot(plot_name, filetype, dpi=300):
 
 
 def plot_points(filetype, name, df, equilibrium=None, min_x=0, max_x=5000, min_y=0, max_y=20, label1='$p_x$',
-                label2='$p_x$', y_label='price'):
+                label2='$p_y$', y_label='Price'):
+    """Plot the learning curve of strategies over time.
+
+    Args:
+        filetype (str): The filetype to save the plots as. (Default value = 'pdf')
+        name (str): The name to save the plot under.
+        df (DataFrame): The data of the experiment.
+        equilibrium (List[Tuple[float, str]], optional): A list of equilibrium points and their labels.
+            (Default value = None)
+        min_x (int, optional): The minimum value on the x-axis. (Default value = 0)
+        max_x (int, optional): The maximum value on the x-axis. (Default value = 5000)
+        min_y (int, optional): The minimum value on the y-axis. (Default value = 0)
+        max_y (int, optional): The maximum value on the y-axis. (Default value = 20)
+        label1 (str, optional): The label for the first player. (Default value = '$p_x$')
+        label2 (str, optional): The label for the second player. (Default value = '$p_y$')
+        y_label (str, optional): The label across the y-axis. (Default value = 'Price')
+
+    Returns:
+
+    """
     ax = sns.lineplot(x='iteration', y='player1', linewidth=2.0, data=df, ci='sd', label=label1)
     ax = sns.lineplot(x='iteration', y='player2', linewidth=2.0, data=df, ci='sd', label=label2)
 
@@ -58,6 +77,14 @@ def plot_points(filetype, name, df, equilibrium=None, min_x=0, max_x=5000, min_y
 
 
 def plot_results(filetype='pdf'):
+    """Plot the results of both experiments.
+
+    Args:
+        filetype (str, optional): The filetype to save the plots as. (Default value = 'pdf')
+
+    Returns:
+
+    """
     name1 = "polynomial_game"
     y_label1 = 'Strategy'
     df1 = pd.read_csv(f'{name1}.csv')
