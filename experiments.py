@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import numpy as np
 import pandas as pd
 
@@ -7,6 +9,8 @@ from best_response import calc_best_response
 from fictitious_play import fictitious_play
 from polynomial_game import setup_polynomial_game
 from strategy_bijections import one_simplex_coord_to_point, one_simplex_point_to_coord
+
+Record = namedtuple('Log', ['run', 'iteration', 'player1', 'player2'])
 
 
 def continuous_br(monfg, u_tpl, player, opp_x, min_x, max_x):
@@ -116,7 +120,7 @@ def transform_log(run, log, min_x, max_x):
         strat2 = record[3:5]
         point1 = one_simplex_coord_to_point(strat1, min_x, max_x)
         point2 = one_simplex_coord_to_point(strat2, min_x, max_x)
-        transformed_record = [run, i, point1, point2]
+        transformed_record = Record(run, i, point1, point2)
         transformed_log.append(transformed_record)
     return transformed_log
 
@@ -131,9 +135,8 @@ def save_logs(logs, name):
     Returns:
 
     """
-    columns = ['run', 'iteration', 'player1', 'player2']
     filename = f'{name}.csv'
-    df = pd.DataFrame(logs, columns=columns)
+    df = pd.DataFrame(logs)
     df.to_csv(filename)
 
 
