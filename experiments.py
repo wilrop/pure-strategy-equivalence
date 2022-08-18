@@ -77,7 +77,7 @@ def run_bertrand_pricing_game(min_price=1, max_price=100, sigma=3, gamma=2, n=27
     return ne, joint_strat, log
 
 
-def run_experiment(monfg, u_tpl, algorithm='FP', max_iter=1000, variant='alternating', global_opt=True):
+def run_experiment(monfg, u_tpl, algorithm='FP', max_iter=1000, variant='simultaneous', global_opt=True):
     """Run an experiment.
 
     Args:
@@ -137,7 +137,7 @@ def save_logs(logs, name):
     """
     filename = f'{name}.csv'
     df = pd.DataFrame(logs)
-    df.to_csv(filename)
+    df.to_csv(filename, index=False)
 
 
 def run_experiments(runs=100):
@@ -151,32 +151,34 @@ def run_experiments(runs=100):
     """
     poly_min_x = -1
     poly_max_x = 1
-    poly_iters = 1000
+    poly_iters = 200
 
-    bertrand_min_x = 10
-    bertrand_max_x = 25
+    bertrand_min_x = 0.001
+    bertrand_max_x = 30
     sigma = 3
     gamma = 2
     n = 2700
     m = 1
     a = 50
-    price_iters = 10
+    price_iters = 400
 
     poly_logs = []
     bertrand_logs = []
 
     for run in range(runs):
         print(f"[{run + 1}/{runs}] Executing run")
+
         ne, final_strat, poly_log = run_polynomial_game(min_x=poly_min_x, max_x=poly_max_x, max_iter=poly_iters)
         poly_logs.extend(transform_log(run, poly_log, poly_min_x, poly_max_x))
+
         ne, final_strat, bertrand_log = run_bertrand_pricing_game(min_price=bertrand_min_x, max_price=bertrand_max_x,
                                                                   sigma=sigma, gamma=gamma, n=n, m=m, a=a,
                                                                   max_iter=price_iters)
         bertrand_logs.extend(transform_log(run, bertrand_log, bertrand_min_x, bertrand_max_x))
 
     save_logs(poly_logs, "polynomial_game")
-    save_logs(bertrand_logs, "bertrand_price_game")
+    save_logs(bertrand_logs, "bertrand_price_game_full")
 
 
 if __name__ == '__main__':
-    run_experiments(runs=100)
+    run_experiments(runs=1000)
