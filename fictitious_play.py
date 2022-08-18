@@ -4,6 +4,67 @@ from Player import FPPlayer
 from best_response import verify_nash
 
 
+def simultaneous_variant(players, epsilon=0, global_opt=False):
+    """Execute one iteration of the simultaneous fictitious play variant.
+
+    Args:
+        players (List[FPPlayer]): A list of fictitious play players.
+        epsilon (float, optional): The tolerance in best response optimisation.
+        global_opt (bool, optional): Whether to find a globally optimal best response or only a locally optimal.
+
+    Returns:
+        Tuple[bool, List[ndarray]]: Whether the policies have converged and the new joint strategy.
+    """
+    converged = True
+    actions = []
+    joint_strategy = []
+
+    for action_player in players:  # Collect actions.
+        actions.append(action_player.select_action())
+
+    for update_player in players:  # Update the empirical state distributions.
+        for action_player_id, action in enumerate(actions):
+            update_player.update_empirical_strategy(action_player_id, action)
+
+        done, br = update_player.update_strategy(epsilon=epsilon, global_opt=global_opt)
+        joint_strategy.append(br)  # Update the joint strategy.
+
+        if not done:
+            converged = False
+
+    return converged, joint_strategy
+
+
+def alternating_variant(players, epsilon=0, global_opt=False):
+    """Execute one iteration of the alternating fictitious play variant.
+
+    Args:
+        players (List[FPPlayer]): A list of fictitious play players.
+        epsilon (float, optional): The tolerance in best response optimisation.
+        global_opt (bool, optional): Whether to find a globally optimal best response or only a locally optimal.
+
+    Returns:
+        Tuple[bool, List[ndarray]]: Whether the policies have converged and the new joint strategy.
+
+    """
+    converged = True
+    joint_strategy = []
+
+    for action_id, action_player in enumerate(players):  # Loop once over each player to update with alternating.
+        done, br = action_player.update_strategy(epsilon=epsilon, global_opt=global_opt)  # Update the player's policy.
+
+        joint_strategy.append(br)
+        action = action_player.select_action()
+
+        for update_player in players:
+            update_player.update_empirical_strategy(action_id, action)
+
+        if not done:
+            converged = False
+
+    return converged, joint_strategy
+
+
 def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=None, variant='alternating',
                     global_opt=False, verify=True, early_stop=None, seed=None):
     """Execute the fictitious play algorithm on a given MONFG and utility functions.
@@ -37,63 +98,10 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
     """
     rng = np.random.default_rng(seed=seed)
 
-    def simultaneous_variant(joint_strategy):
-        """Execute one iteration of the simultaneous fictitious play variant.
-
-        Args:
-            joint_strategy (List[ndarray]): The current joint strategy.
-
-        Returns:
-            Tuple[bool, List[ndarray]]: Whether the policies have converged and the new joint strategy.
-
-        """
-        converged = True
-        actions = []
-
-        for player in players:  # Collect actions.
-            actions.append(player.select_action())
-
-        for player in players:  # Update the empirical state distributions.
-            player.update_empirical_strategies(actions)
-
-        for player_id, player in enumerate(players):  # Update the policies simultaneously.
-            done, br = player.update_strategy(epsilon=epsilon, global_opt=global_opt)
-            joint_strategy[player_id] = br  # Update the joint strategy.
-            converged = False
-
-        return converged, joint_strategy
-
-    def alternating_variant(joint_strategy):
-        """Execute one iteration of the alternating fictitious play variant.
-
-        Args:
-            joint_strategy (List[ndarray]): The current joint strategy.
-
-        Returns:
-            Tuple[bool, List[ndarray]]: Whether the policies have converged and the new joint strategy.
-
-        """
-        converged = True
-
-        for player_id, player in enumerate(players):  # Loop once over each player to update with alternating.
-            actions = []
-
-            for action_player in players:  # Collect actions.
-                actions.append(action_player.select_action())
-
-            for update_player in players:  # Update the empirical state distributions.
-                update_player.update_empirical_strategies(actions)
-
-            done, br = player.update_strategy(epsilon=epsilon,
-                                              global_opt=global_opt)  # Update the current player's policy.
-            joint_strategy[player_id] = br  # Update the joint strategy.
-            converged = False
-
-        return converged, joint_strategy
-
     player_actions = monfg[0].shape[:-1]  # Get the number of actions available to each player.
     players = []  # A list to hold all the players.
-    joint_strategy = []  # A list to hold the current joint strategy.
+    joint_strategy = []
+    log = []  # Initialise the log
 
     for player_id, u in enumerate(u_tpl):  # Loop over all players to create a new FPAgent object.
         payoff_matrix = monfg[player_id]
@@ -104,11 +112,11 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         players.append(player)
         joint_strategy.append(player.strategy)
 
-    nash_equilibrium = False  # The current joint strategy is not known to be a Nash equilibrium at this point.
     if early_stop is None:
         early_stop = max_iter
+
     num_same = 0
-    log = [[0] + [item for strat in joint_strategy for item in strat]]
+    nash_equilibrium = False  # The current joint strategy is not known to be a Nash equilibrium at this point.
 
     if variant == 'simultaneous':
         execute_iteration = simultaneous_variant
@@ -119,12 +127,14 @@ def fictitious_play(monfg, u_tpl, epsilon=0, max_iter=1000, init_joint_strategy=
         if num_same >= early_stop:
             break
 
-        converged, joint_strategy = execute_iteration(joint_strategy)
-        record = [i + 1] + [item for strat in joint_strategy for item in strat]
+        converged, joint_strategy = execute_iteration(players, epsilon=epsilon, global_opt=global_opt)
+        record = [i] + [item for strat in joint_strategy for item in strat]
         log.append(record)
 
         if converged:  # If FP converged, check if we can guarantee a Nash equilibrium.
             num_same += 1
+        else:
+            num_same = 0
 
     if verify:  # Check if the user wanted to verify.
         nash_equilibrium = verify_nash(monfg, u_tpl, joint_strategy, epsilon=epsilon)

@@ -32,10 +32,8 @@ class Player:
         br = calc_best_response(self.u, self.pid, self.payoff_matrix, joint_strategy, epsilon=epsilon,
                                 global_opt=global_opt, init_strat=self.strategy)
 
-        converged = False
-        if self.check_converged(br, joint_strategy, epsilon=epsilon):
-            converged = True
-        else:
+        converged = self.check_converged(br, joint_strategy, epsilon=epsilon)
+        if not converged:
             self.strategy = br
         return converged, br
 
