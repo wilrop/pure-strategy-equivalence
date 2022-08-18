@@ -112,7 +112,11 @@ class FPPlayer(Player):
         joint_strategy = []
 
         for player_actions in self.empirical_strategies:
-            strategy = player_actions / np.sum(player_actions)
+            past_actions = np.sum(player_actions)
+            if past_actions == 0:
+                strategy = np.full(len(player_actions), 1/len(player_actions))
+            else:
+                strategy = player_actions / np.sum(player_actions)
             joint_strategy.append(strategy)
 
         joint_strategy[self.pid] = self.strategy
@@ -133,12 +137,12 @@ class FPPlayer(Player):
         joint_strat = self.calc_joint_strategy()
         return super().update(joint_strat, epsilon=epsilon, global_opt=global_opt)
 
-    def update_empirical_strategies(self, actions):
-        """Update the empirical strategy of all players.
+    def update_empirical_strategy(self, player, action):
+        """Update the empirical strategy of a player.
 
         Args:
-            actions (List[int]): The actions that were taken by the players.
+            player (int): The player to update for.
+            action (int): Their last action.
 
         """
-        for player, action in enumerate(actions):
-            self.empirical_strategies[player][action] += 1
+        self.empirical_strategies[player][action] += 1
