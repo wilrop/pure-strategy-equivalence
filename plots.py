@@ -90,20 +90,65 @@ def plot_results(filetype='pdf'):
     df1 = pd.read_csv(f'{name1}.csv')
     label1, label2 = ('$x$', '$y$')
     equilibrium1 = [(0.39680, '$x^\\ast$'), (0.62996, '$y^\\ast$')]
-    min_x, max_x = (0, df1['iteration'].max())
+    min_x, max_x = (0, 200)
     min_y, max_y = (-1, 1)
     plot_points(filetype, name1, df1, equilibrium=equilibrium1, min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y,
                 label1=label1, label2=label2, y_label=y_label1)
 
-    name2 = "bertrand_price_game"
+    name2 = "bertrand_price_game_full"
+    df = pd.read_csv(f'{name2}.csv')
+    runs = 1000
+    iterations = 200
+    df2 = []
+    df3 = []
+    df4 = []
+    mistakes = 0
+    for i in range(runs):
+        run_data = df.iloc[i * iterations:(i + 1) * iterations]
+        last_row = run_data.iloc[-1]
+        p1 = last_row['player1']
+        p2 = last_row['player2']
+
+        if p1 < 3 and p2 > 24:
+            df2.append(run_data)
+        elif p1 > 24 and p2 < 3:
+            df3.append(run_data)
+        else:
+            df4.append(run_data)
+            mistakes += 1
+            print(p1, p2)
+            print(f"Run {last_row['run']}, Mistake: {mistakes}")
+
+    df2 = pd.concat(df2)
+    df3 = pd.concat(df3)
+
     y_label2 = 'Price'
-    df2 = pd.read_csv(f'{name2}.csv')
+    name2 = "bertrand_price_game1"
     label1, label2 = ('$p_x$', '$p_y$')
-    equilibrium2 = [(22.987, '$p^\\ast_x$ and $p^\\ast_y$')]
+    equilibrium2 = [(2.168, '$p^\\ast_x$'), (25.157, '$p^\\ast_y$')]
     min_x, max_x = (0, df2['iteration'].max())
-    min_y, max_y = (10, 25)
+    min_y, max_y = (0, 30)
     plot_points(filetype, name2, df2, equilibrium=equilibrium2, min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y,
                 label1=label1, label2=label2, y_label=y_label2)
+
+    name3 = "bertrand_price_game2"
+    label1, label2 = ('$p_x$', '$p_y$')
+    equilibrium3 = [(25.157, '$p^\\ast_x$'), (2.168, '$p^\\ast_y$')]
+    min_x, max_x = (0, df3['iteration'].max())
+    min_y, max_y = (0, 30)
+    plot_points(filetype, name3, df3, equilibrium=equilibrium3, min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y,
+                label1=label1, label2=label2, y_label=y_label2)
+
+    y_label4 = 'Price'
+    name4 = "bertrand_price_game_restricted"
+    df4 = pd.read_csv(f'{name4}.csv')
+    name4 = "bertrand_price_game_restricted"
+    label1, label2 = ('$p_x$', '$p_y$')
+    equilibrium4 = [(22.987, '$p^\\ast_x$'), (22.987, '$p^\\ast_y$')]
+    min_x, max_x = (0, 10)
+    min_y, max_y = (0, 30)
+    plot_points(filetype, name4, df4, equilibrium=equilibrium4, min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y,
+                label1=label1, label2=label2, y_label=y_label4)
 
 
 if __name__ == "__main__":
