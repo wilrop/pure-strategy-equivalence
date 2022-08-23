@@ -153,14 +153,14 @@ def run_experiments(runs=100):
     poly_max_x = 1
     poly_iters = 200
 
-    bertrand_min_x = 0.001
+    bertrand_min_x = 1
     bertrand_max_x = 30
     sigma = 3
     gamma = 2
     n = 2700
     m = 1
     a = 50
-    price_iters = 400
+    price_iters = 200
 
     poly_logs = []
     bertrand_logs = []
