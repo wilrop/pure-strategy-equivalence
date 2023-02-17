@@ -7,8 +7,7 @@ To reproduce the experiments, simply run the ``experiments.py`` file with the de
 ## Citation
 To cite this paper, you may use the below BibTeX entry for now.
 
-```
-````bibtex
+```bibtex
 @misc{ropke2023bridging,
   doi = {10.48550/ARXIV.2301.05755},
   
@@ -26,5 +25,4 @@ To cite this paper, you may use the below BibTeX entry for now.
   
   copyright = {arXiv.org perpetual, non-exclusive license}
 }
-
-````
+```
