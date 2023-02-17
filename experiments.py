@@ -131,9 +131,6 @@ def save_logs(logs, name):
     Args:
         logs (List[float]): A log of strategies in the continuous game.
         name (str): The name of the experiment.
-
-    Returns:
-
     """
     filename = f'{name}.csv'
     df = pd.DataFrame(logs)
@@ -141,13 +138,10 @@ def save_logs(logs, name):
 
 
 def run_experiments(runs=100):
-    """Run all experiments for a number of trials.
+    """Run all experiments for a number of runs.
 
     Args:
         runs (int, optional): The number of times to repeat the experiments. (Default value = 100)
-
-    Returns:
-
     """
     poly_min_x = -1
     poly_max_x = 1
