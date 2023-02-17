@@ -51,9 +51,6 @@ def plot_points(filetype, name, df, equilibrium=None, min_x=0, max_x=5000, min_y
         label1 (str, optional): The label for the first player. (Default value = '$p_x$')
         label2 (str, optional): The label for the second player. (Default value = '$p_y$')
         y_label (str, optional): The label across the y-axis. (Default value = 'Price')
-
-    Returns:
-
     """
     ax = sns.lineplot(x='iteration', y='player1', linewidth=2.0, data=df, ci='sd', label=label1)
     ax = sns.lineplot(x='iteration', y='player2', linewidth=2.0, data=df, ci='sd', label=label2)
@@ -81,9 +78,6 @@ def plot_results(filetype='pdf'):
 
     Args:
         filetype (str, optional): The filetype to save the plots as. (Default value = 'pdf')
-
-    Returns:
-
     """
     name1 = "polynomial_game"
     y_label1 = 'Strategy'

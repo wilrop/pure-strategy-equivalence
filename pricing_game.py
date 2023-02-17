@@ -1,8 +1,9 @@
-from identity_game import identity_game
-from best_response.execute_algorithm import execute_algorithm
-from best_response.best_response import calc_best_response
-import utils.printing as pt
 import numpy as np
+from best_response.best_response import calc_best_response
+from best_response.execute_algorithm import execute_algorithm
+
+import utils.printing as pt
+from identity_game import identity_game
 
 
 def strat_from_price(price, min_price, max_price):
@@ -16,7 +17,7 @@ def strat_from_price(price, min_price, max_price):
     Returns:
         ndarray: The corresponding strategy.
     """
-    x_strat = (price - min_price)/(max_price - min_price)
+    x_strat = (price - min_price) / (max_price - min_price)
     y_strat = 1 - x_strat
     strat = np.array([x_strat, y_strat])
     return strat

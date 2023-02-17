@@ -5,6 +5,7 @@ from best_response import calc_best_response, calc_utility_from_joint_strat
 
 class Player:
     """A best-response player"""
+
     def __init__(self, pid, u, num_actions, payoff_matrix, init_strategy=None, rng=None):
         self.pid = pid
         self.u = u
@@ -62,6 +63,7 @@ class Player:
 
 class IBRPlayer(Player):
     """A player that learns a strategy using best-response iteration."""
+
     def __init__(self, pid, u, num_actions, payoff_matrix, init_strategy=None, rng=None):
         super().__init__(pid, u, num_actions, payoff_matrix, init_strategy=init_strategy, rng=rng)
 
@@ -112,7 +114,7 @@ class FPPlayer(Player):
         for player_actions in self.empirical_strategies:
             past_actions = np.sum(player_actions)
             if past_actions == 0:
-                strategy = np.full(len(player_actions), 1/len(player_actions))
+                strategy = np.full(len(player_actions), 1 / len(player_actions))
             else:
                 strategy = player_actions / np.sum(player_actions)
             joint_strategy.append(strategy)
